@@ -1,0 +1,8 @@
+version : 2
+
+sources:
+  - name : SPARC_RAW
+    schema: RBOK_GA
+    tables:
+      - name : ga4_table
+        identifier : GA4_EVENTS_RAW
