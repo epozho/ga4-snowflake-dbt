@@ -43,3 +43,10 @@ models:
       src_base_test:
         +materialized: view
         +schema: ECOM_ANALYTICS
+      src_execute_SP:
+        +materialized: view
+        +schema: RBOK_GA
+      src_load_ga4_raw_to_base:
+        +materialized: view
+        +schema: ECOM_ANALYTICS
+      
