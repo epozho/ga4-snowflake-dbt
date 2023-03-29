@@ -36,5 +36,5 @@ models:
     # Applies to all files under models/example/
     example:
       materialized: view
-    # src:
-    #   +schema: RBOK_GA
+    src_test:
+      +schema: RBOK_GA
