@@ -38,4 +38,5 @@ models:
       materialized: view
     src:
       src_test:
-      +schema: RBOK_GA
+        +materialized: view
+        +schema: RBOK_GA
