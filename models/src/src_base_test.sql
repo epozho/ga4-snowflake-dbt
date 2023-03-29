@@ -1,4 +1,4 @@
-{{ config(materialized='table',schema="ECOM_ANALYTICS") }}
+{{ config(materialized='table',database="SPARC_BASE",schema="ECOM_ANALYTICS") }}
 
 select *
 from {{ ref("src_test") }}
