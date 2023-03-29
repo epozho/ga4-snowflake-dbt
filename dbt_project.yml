@@ -40,3 +40,6 @@ models:
       src_test:
         +materialized: view
         +schema: RBOK_GA
+      src_base_test:
+        +materialized: view
+        +schema: ECOM_ANALYTICS

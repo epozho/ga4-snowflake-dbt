@@ -6,3 +6,6 @@ sources:
     tables:
       - name : ga4_table
         identifier : GA4_EVENTS_RAW
+  - name : SPARC_BASE
+    schema: ECOM_ANALYTICS
+    

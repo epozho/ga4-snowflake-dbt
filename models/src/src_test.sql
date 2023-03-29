@@ -1,4 +1,4 @@
-{{ config(schema="RBOK_GA") }}
+{{ config(materialized='table',schema="RBOK_GA") }}
 
 select *
 from {{ source("SPARC_RAW","ga4_table") }}
