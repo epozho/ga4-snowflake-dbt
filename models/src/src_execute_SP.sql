@@ -1,0 +1,1 @@
+CALL flatten_GA4_events_raw_sample();
