@@ -1,3 +1,7 @@
-{{ config(database="SPARC_RAW",schema="RBOK_GA") }}
+{{ config(materialized='table',database="SPARC_BASE",schema="ECOM_ANALYTICS") }}
 
-EXECUTE flatten_GA4_events_raw()
+
+{% set my_proc_call = "CALL flatten_GA4_events_raw_sample() "%}
+{% set my_proc_results = run_operation(my_proc_call) %}
+
+Select * from {{ ref('my_proc_results') }}
