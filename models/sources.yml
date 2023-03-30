@@ -2,6 +2,7 @@ version : 2
 
 sources:
   - name : SPARC_RAW
+    # adapter: snowflake
     schema: RBOK_GA
     tables:
       - name : ga4_table
