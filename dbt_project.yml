@@ -46,4 +46,7 @@ models:
       GA4_SNAPSHOT:
         +materialized: view
         +schema: ECOM_ANALYTICS
+      GA4_SNAPSHOT_RPT:
+        +materialized: view
+        +schema: ECOM_ANALYTICS
       

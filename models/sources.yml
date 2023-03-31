@@ -11,4 +11,5 @@ sources:
         identifier : GA4_EVENTS_RAW_SAMPLE
   - name : SPARC_BASE
     schema: ECOM_ANALYTICS
-    
+  - name : RBOK_RPT
+    schema: ECOM_ANALYTICS    
