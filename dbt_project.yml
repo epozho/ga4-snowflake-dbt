@@ -52,4 +52,34 @@ models:
       FACT_RETAIL_SALES_RPT:
         +materialized: view
         +schema: ECOM_ANALYTICS
+      FACT_INVENTORY_RPT:
+        +materialized: view
+        +schema: ECOM_ANALYTICS
+      FACT_DEMAND_RPT:
+        +materialized: view
+        +schema: ECOM_ANALYTICS
+      FACT_STORE_HOUR_COUNTS_RPT:
+        +materialized: view
+        +schema: ECOM_ANALYTICS
+      DIM_LOCATION_RPT:
+        +materialized: view
+        +schema: ECOM_ANALYTICS
+      DIM_PRODUCT_RPT:
+        +materialized: view
+        +schema: ECOM_ANALYTICS
+      DIM_TIME_CALENDAR_DATE_RPT:
+        +materialized: view
+        +schema: ECOM_ANALYTICS
+      DIM_TIME_CALENDAR_MONTH_RPT:
+        +materialized: view
+        +schema: ECOM_ANALYTICS
+      DIM_TIME_CALENDAR_QUARTER_RPT:
+        +materialized: view
+        +schema: ECOM_ANALYTICS
+      DIM_TIME_CALENDAR_WEEK_RPT:
+        +materialized: view
+        +schema: ECOM_ANALYTICS
+      DIM_TIME_CALENDAR_YEAR_RPT:
+        +materialized: view
+        +schema: ECOM_ANALYTICS
       
