@@ -43,7 +43,7 @@ models:
       src_base_test:
         +materialized: view
         +schema: ECOM_ANALYTICS
-      src_execute_SP:
+      GA4_SNAPSHOT:
         +materialized: view
         +schema: ECOM_ANALYTICS
       
