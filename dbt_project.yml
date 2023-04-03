@@ -82,4 +82,7 @@ models:
       DIM_TIME_CALENDAR_YEAR_RPT:
         +materialized: view
         +schema: ECOM_ANALYTICS
+      RETAIL_SALES_AGGREGATED:
+        +materialized: view
+        +schema: ECOM_ANALYTICS
       
