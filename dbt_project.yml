@@ -58,6 +58,9 @@ models:
       GA4_SNAPSHOT_RPT:
         +materialized: view
         +schema: ECOM_ANALYTICS
+      GA4_SNAPSHOT_RPT_v2:
+        +materialized: view
+        +schema: ECOM_ANALYTICS
       FACT_RETAIL_SALES_RPT:
         +materialized: view
         +schema: ECOM_ANALYTICS
