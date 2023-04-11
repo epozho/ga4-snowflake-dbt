@@ -61,6 +61,12 @@ models:
       GA4_SNAPSHOT_RPT_v2:
         +materialized: view
         +schema: ECOM_ANALYTICS
+      LAST_TOUCH_TRAFFIC:
+        +materialized: view
+        +schema: ECOM_ANALYTICS
+      LAST_TOUCH_EP:
+        +materialized: view
+        +schema: ECOM_ANALYTICS
       FACT_RETAIL_SALES_RPT:
         +materialized: view
         +schema: ECOM_ANALYTICS
