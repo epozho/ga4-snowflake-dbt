@@ -1,7 +1,7 @@
 {{ config(materialized="table", database="SPARC_BASE", schema="ECOM_ANALYTICS") }}
 
 Select * from (
-Select distinct GA4.*,
+Select GA4.*,
 Traffic.TRAFFIC_SOURCE_NAME as LastTouch_Traffic_Name,
 Traffic.TRAFFIC_SOURCE_MEDIUM as LastTouch_Traffic_Medium,
 Traffic.TRAFFIC_SOURCE_SOURCE as LastTouch_Traffic_Source,
@@ -25,10 +25,10 @@ ITEMS_ITEM_NAME as STYLE,
 ITEMS_ITEM_BRAND as FRANCHISE,
 --ITEMS_ITEM_VARIANT,
 --ITEMS_ITEM_CATEGORY,
-ITEMS_ITEM_CATEGORY2,
-ITEMS_ITEM_CATEGORY3,
-ITEMS_ITEM_CATEGORY4,
-ITEMS_ITEM_CATEGORY5,
+ITEMS_ITEM_CATEGORY2 as GENDER,
+ITEMS_ITEM_CATEGORY3 as CORPORATE_MARKETING_LINE,
+ITEMS_ITEM_CATEGORY4 as PRODUCT_TYPE,
+ITEMS_ITEM_CATEGORY5 as CATEGORY_MARKETING_LINE,
 ITEMS_PRICE_IN_USD ,
 ITEMS_QUANTITY ,
 ITEMS_ITEM_REVENUE_IN_USD,
@@ -178,8 +178,8 @@ from
 PIVOT( MAX(EVENT_NAME_FLAG) FOR EVENT_NAME IN ('add_to_cart','login','view_item','begin_checkout','select_item','first_visit','session_start','purchase','search','remove_from_cart','user_engagement','view_item_list','page_view','add_payment_info','add_to_wishlist','sign_up_newsletter','sign_up','view_cart','add_shipping_info')
 ) AS pivoted_data
 )
-as GA4
-LEFT JOIN "SPARC_BASE"."ECOM_ANALYTICS"."LAST_TOUCH_TRAFFIC" as Traffic ON Traffic.USER_SESSION_KEY=GA4.USER_SESSION_KEY
+as GA4 --143,733,650 rows
+LEFT JOIN "SPARC_BASE"."ECOM_ANALYTICS"."LAST_TOUCH_TRAFFIC" as Traffic ON Traffic.USER_SESSION_KEY=GA4.USER_SESSION_KEY --143,733,650 rows
 LEFT JOIN 
 (
 Select distinct 
@@ -190,7 +190,7 @@ Product.BUSINESS_SEGMENT_DESC
 from "SPARC_BASE"."ECOM_ANALYTICS"."DIM_PRODUCT" as Product
 WHERE KEY_CATEGORY_DESC is not null AND BUSINESS_SEGMENT_DESC is not null AND KEY_CATEGORY_DESC!='' AND BUSINESS_SEGMENT_DESC!=''
 )
-as Product ON Product.ARTICLE=GA4.ITEMS_ITEM_ID
+as Product ON Product.ARTICLE=GA4.ITEMS_ITEM_ID --143,733,650 rows
 ORDER BY GA4.USER_SESSION_KEY, GA4.EVENT_DATE DESC
 )
 
