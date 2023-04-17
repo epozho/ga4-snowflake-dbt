@@ -88,22 +88,10 @@ models:
       DIM_PRODUCT_RPT:
         +materialized: view
         +schema: ECOM_ANALYTICS
-      DIM_TIME_CALENDAR_DATE_RPT:
-        +materialized: view
-        +schema: ECOM_ANALYTICS
-      DIM_TIME_CALENDAR_MONTH_RPT:
-        +materialized: view
-        +schema: ECOM_ANALYTICS
-      DIM_TIME_CALENDAR_QUARTER_RPT:
-        +materialized: view
-        +schema: ECOM_ANALYTICS
-      DIM_TIME_CALENDAR_WEEK_RPT:
-        +materialized: view
-        +schema: ECOM_ANALYTICS
-      DIM_TIME_CALENDAR_YEAR_RPT:
-        +materialized: view
-        +schema: ECOM_ANALYTICS
       RETAIL_SALES_AGGREGATED:
+        +materialized: view
+        +schema: ECOM_ANALYTICS
+      GA4_AGGREGATED:
         +materialized: view
         +schema: ECOM_ANALYTICS
       
