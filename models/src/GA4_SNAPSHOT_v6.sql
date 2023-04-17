@@ -66,7 +66,18 @@ TO_NUMBER("'add_to_wishlist'") as Event_add_to_wishlist,
 TO_NUMBER("'sign_up_newsletter'") as Event_sign_up_newsletter,
 TO_NUMBER("'sign_up'") as Event_sign_up,
 TO_NUMBER("'view_cart'") as Event_view_cart,
-TO_NUMBER("'add_shipping_info'") as Event_add_shipping_info
+TO_NUMBER("'add_shipping_info'") as Event_add_shipping_info,
+TO_NUMBER("'navigation'") as Event_navigation,
+TO_NUMBER("'select_promotion'") as Event_select_promotion,
+TO_NUMBER("'view_search_results'") as Event_view_search_results,
+TO_NUMBER("'fetch_user_data'") as Event_fetch_user_data,
+TO_NUMBER("'review_order'") as Event_review_order,
+TO_NUMBER("'error_404'") as Event_error_404,
+TO_NUMBER("'sort_applied'") as Event_sort_applied,
+TO_NUMBER("'out_of_stock_signup'") as Event_out_of_stock_signup,
+TO_NUMBER("'filter_added'") as Event_filter_added,
+TO_NUMBER("'no_search_results'") as Event_no_search_results,
+TO_NUMBER("'form_error'") as Event_form_error
 from
 (Select
     EVENT_DATE,
@@ -184,10 +195,10 @@ from
         ) AS pivoted_data
     )
 ) as data_to_pivot_1
-PIVOT( MAX(EVENT_NAME_FLAG) FOR EVENT_NAME IN ('add_to_cart','login','view_item','begin_checkout','select_item','first_visit','session_start','purchase','search','remove_from_cart','user_engagement','view_item_list','page_view','add_payment_info','add_to_wishlist','sign_up_newsletter','sign_up','view_cart','add_shipping_info')
+PIVOT( MAX(EVENT_NAME_FLAG) FOR EVENT_NAME IN ('view_item','navigation','session_start','purchase','select_promotion','add_to_cart','login','begin_checkout','user_engagement','sign_up','view_search_results','remove_from_cart','fetch_user_data','review_order','error_404','sort_applied','first_visit','select_item','view_item_list','page_view','add_payment_info','add_to_wishlist','sign_up_newsletter','out_of_stock_signup','search','filter_added','no_search_results','add_shipping_info','view_cart','form_error')
 ) AS pivoted_data
 )
-as GA4 --143,733,650 rows
+as GA4 
 LEFT JOIN "SPARC_BASE"."ECOM_ANALYTICS"."LAST_TOUCH_TRAFFIC" as Traffic ON Traffic.USER_SESSION_KEY=GA4.USER_SESSION_KEY --143,733,650 rows
 LEFT JOIN 
 (
@@ -199,7 +210,7 @@ Product.BUSINESS_SEGMENT_DESC
 from "SPARC_BASE"."ECOM_ANALYTICS"."DIM_PRODUCT" as Product
 WHERE KEY_CATEGORY_DESC is not null AND BUSINESS_SEGMENT_DESC is not null AND KEY_CATEGORY_DESC!='' AND BUSINESS_SEGMENT_DESC!=''
 )
-as Product ON Product.ARTICLE=GA4.ITEMS_ITEM_ID --143,733,650 rows
+as Product ON Product.ARTICLE=GA4.ITEMS_ITEM_ID 
 ORDER BY GA4.USER_SESSION_KEY, GA4.EVENT_DATE DESC
 )
 
