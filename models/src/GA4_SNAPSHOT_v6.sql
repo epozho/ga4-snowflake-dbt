@@ -2,19 +2,8 @@
 
 Select * from (
 Select 
-max(GA4.CHECKOUT_STAGE_ORDER) OVER(PARTITION BY GA4.USER_SESSION_KEY ORDER BY GA4.EVENT_TIMESTAMP DESC) as MAX_CHECKOUT_STAGE_ORDER,
-(CASE
-    WHEN MAX_CHECKOUT_STAGE_ORDER=1 THEN 'add_to_cart'
-    WHEN MAX_CHECKOUT_STAGE_ORDER=2 THEN 'view_cart' 
-    WHEN MAX_CHECKOUT_STAGE_ORDER=3 THEN 'begin_checkout' 
-    WHEN MAX_CHECKOUT_STAGE_ORDER=4 THEN 'add_shipping_info'
-    WHEN MAX_CHECKOUT_STAGE_ORDER=5 THEN 'add_payment_info' 
-    WHEN MAX_CHECKOUT_STAGE_ORDER=6 THEN 'review_order' 
-    WHEN MAX_CHECKOUT_STAGE_ORDER=7 THEN 'purchase'
-    ELSE NULL
-END) as MAX_CHECKOUT_STAGE,
 GA4.*,
-Traffic.TRAFFIC_SOURCE_NAME as LastTouch_Traffic_Name,
+Traffic.TRAFFIC_SOURCE_NAME as LastTouch_Traffic_Campaign,
 Traffic.TRAFFIC_SOURCE_MEDIUM as LastTouch_Traffic_Medium,
 Traffic.TRAFFIC_SOURCE_SOURCE as LastTouch_Traffic_Source,
 Product.DIVISION_NAME,
@@ -32,6 +21,87 @@ SUBSTR(Date.ACCTGPRDWOYNM,6,2) as ACCTGPRDWOYNM_NUMBER,
 Date.SEASNNM as SEASNNM
 from 
 (
+Select 
+max(GA4.CHECKOUT_STAGE_ORDER) OVER(PARTITION BY GA4.USER_SESSION_KEY ORDER BY GA4.EVENT_TIMESTAMP DESC) as MAX_CHECKOUT_STAGE_ORDER,
+(CASE
+    WHEN MAX_CHECKOUT_STAGE_ORDER=1 THEN 'add_to_cart'
+    WHEN MAX_CHECKOUT_STAGE_ORDER=2 THEN 'view_cart' 
+    WHEN MAX_CHECKOUT_STAGE_ORDER=3 THEN 'begin_checkout' 
+    WHEN MAX_CHECKOUT_STAGE_ORDER=4 THEN 'add_shipping_info'
+    WHEN MAX_CHECKOUT_STAGE_ORDER=5 THEN 'add_payment_info' 
+    WHEN MAX_CHECKOUT_STAGE_ORDER=6 THEN 'review_order' 
+    WHEN MAX_CHECKOUT_STAGE_ORDER=7 THEN 'purchase'
+    ELSE NULL
+END) as MAX_CHECKOUT_STAGE,
+CHECKOUT_STAGE_ORDER,
+EVENT_DATE,
+EVENT_TIMESTAMP ,
+EVENT_NAME_ORIGINAL,
+USER_SESSION_KEY,
+EVENT_BUNDLE_SEQUENCE_ID,
+USER_PSEUDO_ID,
+ECOMMERCE_TRANSACTION_ID,
+DEVICE_CATEGORY,
+UNITS_ORDERED,
+--TRAFFIC_SOURCE_NAME as CAMPAIGN,
+--TRAFFIC_SOURCE_MEDIUM as MEDIUM,
+--TRAFFIC_SOURCE_SOURCE as SOURCE,
+ITEMS_ITEM_ID,
+STYLE,
+FRANCHISE,
+--ITEMS_ITEM_VARIANT,
+--ITEMS_ITEM_CATEGORY,
+GENDER,
+CORPORATE_MARKETING_LINE,
+PRODUCT_TYPE,
+CATEGORY_MARKETING_LINE,
+ITEMS_PRICE_IN_USD ,
+ITEMS_QUANTITY ,
+ITEMS_ITEM_REVENUE_IN_USD,
+EP_PAGE_TYPE,
+--EP_ENGAGED_SESSION_EVENT,
+EP_PAGE_OWNER,
+--EP_MEDIUM,
+--EP_FIREBASE_CONVERSION,
+--EP_SESSION_ENGAGED,
+EP_ENTRANCES,
+--EP_TRANSACTION_ID,
+--EP_CAMPAIGN,
+EP_GA_SESSION_ID,
+EP_CHECKOUT_ORDERDISCOUNTVALUE,
+--EP_SOURCE,
+--EP_GA_SESSION_NUMBER,
+Event_add_to_cart,
+Event_login,
+Event_view_item,
+Event_begin_checkout,
+Event_select_item,
+Event_first_visit,
+Event_session_start,
+Event_purchase,
+Event_search,
+Event_remove_from_cart,
+Event_user_engagement,
+Event_view_item_list,
+Event_page_view,
+Event_add_payment_info,
+Event_add_to_wishlist,
+Event_sign_up_newsletter,
+Event_sign_up,
+Event_view_cart,
+Event_add_shipping_info,
+Event_navigation,
+Event_select_promotion,
+Event_view_search_results,
+Event_fetch_user_data,
+Event_review_order,
+Event_error_404,
+Event_sort_applied,
+Event_out_of_stock_signup,
+Event_filter_added,
+Event_no_search_results,
+Event_form_error
+from (
 Select
 (CASE
     WHEN EVENT_NAME_ORIGINAL='add_to_cart' THEN 1
@@ -229,6 +299,7 @@ from
 ) as data_to_pivot_1
 PIVOT( MAX(EVENT_NAME_FLAG) FOR EVENT_NAME IN ('view_item','navigation','session_start','purchase','select_promotion','add_to_cart','login','begin_checkout','user_engagement','sign_up','view_search_results','remove_from_cart','fetch_user_data','review_order','error_404','sort_applied','first_visit','select_item','view_item_list','page_view','add_payment_info','add_to_wishlist','sign_up_newsletter','out_of_stock_signup','search','filter_added','no_search_results','add_shipping_info','view_cart','form_error')
 ) AS pivoted_data
+)
 )
 as GA4 
 LEFT JOIN "SPARC_BASE"."ECOM_ANALYTICS"."LAST_TOUCH_TRAFFIC" as Traffic ON Traffic.USER_SESSION_KEY=GA4.USER_SESSION_KEY --143,733,650 rows
