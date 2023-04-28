@@ -94,6 +94,9 @@ models:
       GA4_AGGREGATED:
         +materialized: view
         +schema: ECOM_ANALYTICS
+      INVENTORY_AGGREGATED:
+        +materialized: view
+        +schema: ECOM_ANALYTICS
       REEBOK_FACT_AGGREGATED_COMBINED:
         +materialized: view
         +schema: ECOM_ANALYTICS
