@@ -435,7 +435,7 @@ from
                  ITEMS_PRICE_IN_USD ,
                  ITEMS_QUANTITY ,
                  ITEMS_ITEM_REVENUE_IN_USD
-          FROM SPARC_RAW.RBOK_GA.GA4_EVENTS_RAW
+          FROM SPARC_BASE.ECOM_ANALYTICS.GA4_EVENTS_RAW_BACKUP
         ) AS data_to_pivot
         PIVOT (
           MAX(EVENT_PARAMS_VALUE) FOR EVENT_PARAMS_KEY IN ('page_type',/*'engaged_session_event',*/'page_owner',/*'medium','firebase_conversion','session_engaged',*/'entrances',/*'transaction_id','campaign',*/'ga_session_id','checkout_orderdiscountvalue'/*,'source','ga_session_number'*/)
