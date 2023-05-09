@@ -97,6 +97,9 @@ models:
       INVENTORY_AGGREGATED:
         +materialized: view
         +schema: ECOM_ANALYTICS
+      MAO_AGGREGATED:
+        +materialized: view
+        +schema: ECOM_ANALYTICS
       REEBOK_FACT_AGGREGATED_COMBINED:
         +materialized: view
         +schema: ECOM_ANALYTICS
