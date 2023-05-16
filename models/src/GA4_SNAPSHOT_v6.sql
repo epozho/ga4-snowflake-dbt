@@ -57,10 +57,11 @@ FIRST_GA4_FLATTEN AS
         TO_NUMBER("'entrances'") as EP_ENTRANCES,
         TO_VARCHAR("'ga_session_id'") as EP_GA_SESSION_ID,
         CONCAT(USER_PSEUDO_ID,'|',EP_GA_SESSION_ID) as USER_SESSION_KEY,
-        TO_NUMBER("'checkout_orderdiscountvalue'",10,2) as EP_CHECKOUT_ORDERDISCOUNTVALUE
+        TO_NUMBER("'checkout_orderdiscountvalue'",10,2) as EP_CHECKOUT_ORDERDISCOUNTVALUE,
+	    TO_NUMBER("'session_engaged'") as EP_SESSION_ENGAGED
         FROM CLEAN_GA4_EVENT_PARAMS_VALUE AS data_to_pivot
         PIVOT (
-          MAX(EVENT_PARAMS_VALUE) FOR EVENT_PARAMS_KEY IN ('page_type','page_owner','entrances','ga_session_id','checkout_orderdiscountvalue')
+          MAX(EVENT_PARAMS_VALUE) FOR EVENT_PARAMS_KEY IN ('page_type','page_owner','entrances','ga_session_id','checkout_orderdiscountvalue','session_engaged')
         ) AS pivoted_data
 )
 Select
@@ -107,6 +108,7 @@ EP_PAGE_OWNER,
 EP_ENTRANCES,
 EP_GA_SESSION_ID,
 EP_CHECKOUT_ORDERDISCOUNTVALUE,
+EP_SESSION_ENGAGED,
 TO_NUMBER("'add_to_cart'") as EVENT_ADD_TO_CART,
 TO_NUMBER("'login'") as EVENT_LOGIN,
 TO_NUMBER("'view_item'") as EVENT_VIEW_ITEM,
