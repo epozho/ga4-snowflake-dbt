@@ -227,6 +227,7 @@ Date_Table.MAX_FISCAL_YEAR_DAY_NUM
 FROM "SPARC_BASE"."ECOM_ANALYTICS"."GA4_FLATTENED" as GA4
 LEFT JOIN LAST_TOUCH_TRAFFIC as Traffic ON Traffic.USER_SESSION_KEY=GA4.USER_SESSION_KEY
 LEFT JOIN 
+--The Left join on this product table is to ensure that we only read product records that always contain value both in KEY_CATEGORY_DESC and BUSINESS_SEGMENT_DESC
 (
 Select distinct 
 Product.Article,
@@ -239,6 +240,10 @@ WHERE KEY_CATEGORY_DESC is not null AND BUSINESS_SEGMENT_DESC is not null AND KE
 LEFT JOIN Date_Table as Date_Table on Date_Table.CALDT=GA4.EVENT_DATE
 ORDER BY GA4.USER_SESSION_KEY, GA4.EVENT_DATE DESC
 ),
+--Final Aggregation of GA4 data:
+--The below script is divided into 2 groups: 
+--First group is to Aggregate all of the purchase events successfully and ensure their values are not being mixed with non-purchased events
+--Second group is to Aggregae all of the non-purchase events that tend to not have any revenue present
 GA4_AGGREGATED AS
 (
 (Select
