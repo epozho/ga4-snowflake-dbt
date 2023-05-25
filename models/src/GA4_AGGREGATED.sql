@@ -65,17 +65,18 @@ from Date_Table_Calc
 ),
 --LAST_TOUCH_TRAFFIC is the last traffic attribute that exist for every event across Traffic Campaign, Traffic Medium and Traffic Source
 --This is done by ranking the EVENT_TIMESTAMP by USER_SESSION_KEY and selecting the top Rank that contains the last touch traffic
---The below script is divided into 3 groups: 
---One is to ensure that all of the USER_SESSION_KEY's for purchase items are addressed correctly for their last touch traffic that are populated for all traffic columns
+--The below script is divided into 2 groups: 
+--One is to ensure that any event that consists of purchase must have its corresponding values for last touch traffic to be populated by the latest Event timestamp of that purchase event only, this ignores any other events thats could be fired later
+--Two is to ensure that any event that does not consist of purchase must have its corresponding values for last touch traffic to be populated by the latest Event timestamp
 LAST_TOUCH_TRAFFIC AS
 (
 (Select USER_SESSION_KEY, EVENT_TIMESTAMP,EVENT_NAME_ORIGINAL,TRAFFIC_SOURCE_NAME, TRAFFIC_SOURCE_MEDIUM, TRAFFIC_SOURCE_SOURCE
 from (
 Select distinct row_number() OVER(PARTITION BY USER_SESSION_KEY ORDER BY EVENT_TIMESTAMP DESC) AS Rank,USER_SESSION_KEY, EVENT_TIMESTAMP,EVENT_NAME_ORIGINAL,TRAFFIC_SOURCE_NAME, TRAFFIC_SOURCE_MEDIUM, TRAFFIC_SOURCE_SOURCE --EP_MEDIUM, EP_CAMPAIGN, EP_SOURCE
-from "SPARC_BASE"."ECOM_ANALYTICS"."GA4_SNAPSHOT_V6"
+from "SPARC_BASE"."ECOM_ANALYTICS"."GA4_FLATTENED"
 WHERE USER_SESSION_KEY IN
 (
-    Select distinct USER_SESSION_KEY from "SPARC_BASE"."ECOM_ANALYTICS"."GA4_SNAPSHOT_V6"
+    Select distinct USER_SESSION_KEY from "SPARC_BASE"."ECOM_ANALYTICS"."GA4_FLATTENED"
     WHERE EVENT_NAME_ORIGINAL='purchase'
     AND (TRAFFIC_SOURCE_NAME is not null
     OR TRAFFIC_SOURCE_MEDIUM is not null
@@ -95,10 +96,10 @@ UNION ALL
 (Select USER_SESSION_KEY, EVENT_TIMESTAMP,EVENT_NAME_ORIGINAL,TRAFFIC_SOURCE_NAME, TRAFFIC_SOURCE_MEDIUM, TRAFFIC_SOURCE_SOURCE 
 from (
 Select distinct row_number() OVER(PARTITION BY USER_SESSION_KEY ORDER BY EVENT_TIMESTAMP DESC) AS Rank,USER_SESSION_KEY, EVENT_TIMESTAMP,EVENT_NAME_ORIGINAL, TRAFFIC_SOURCE_NAME, TRAFFIC_SOURCE_MEDIUM, TRAFFIC_SOURCE_SOURCE --EP_MEDIUM, EP_CAMPAIGN, EP_SOURCE
-from "SPARC_BASE"."ECOM_ANALYTICS"."GA4_SNAPSHOT_V6"
+from "SPARC_BASE"."ECOM_ANALYTICS"."GA4_FLATTENED"
 WHERE USER_SESSION_KEY NOT IN
 (
-    Select distinct USER_SESSION_KEY from "SPARC_BASE"."ECOM_ANALYTICS"."GA4_SNAPSHOT_V6"
+    Select distinct USER_SESSION_KEY from "SPARC_BASE"."ECOM_ANALYTICS"."GA4_FLATTENED"
     WHERE EVENT_NAME_ORIGINAL='purchase'
     AND (TRAFFIC_SOURCE_NAME is not null
     OR TRAFFIC_SOURCE_MEDIUM is not null
@@ -109,6 +110,10 @@ ORDER BY USER_SESSION_KEY, EVENT_TIMESTAMP DESC
 )
 WHERE RANK=1)
 ),
+--GA4_FINAL is responsible to read all columns that were flattened in GA4_FLATTENED and LEFT JOIN onto LastTouchTraffic, Products, Location and Date table attributes
+--ENGAGED_GA_USER_SESSION_KEY: Created a flag that populated USER_SESSION_KEY for any event that has a session engaged, useful for count distinct count of USER_SESSION_KEY's with active sessions
+--MEDIA_CHANNEL: Addtional column to identify MEDIA_CHANNEL based on rules provided through the GA4 documentation
+--FUNNEL: A further aggregation of the MEDIA_CHANNEL's that are funneled into their respective funnel categories
 GA4_FINAL AS
 (
 SELECT
@@ -219,7 +224,7 @@ Date_Table.DAY_NUM_IN_FISCAL_YEAR,
 Date_Table.MAX_FISCAL_MONTH_DAY_NUM,
 Date_Table.MAX_FISCAL_QUARTER_DAY_NUM,
 Date_Table.MAX_FISCAL_YEAR_DAY_NUM
-FROM "SPARC_BASE"."ECOM_ANALYTICS"."GA4_SNAPSHOT_V6" as GA4
+FROM "SPARC_BASE"."ECOM_ANALYTICS"."GA4_FLATTENED" as GA4
 LEFT JOIN LAST_TOUCH_TRAFFIC as Traffic ON Traffic.USER_SESSION_KEY=GA4.USER_SESSION_KEY
 LEFT JOIN 
 (
