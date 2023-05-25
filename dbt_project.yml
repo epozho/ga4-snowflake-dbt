@@ -37,61 +37,13 @@ models:
     example:
       materialized: view
     src:
-      src_test:
-        +materialized: view
-        +schema: RBOK_GA
-      src_base_test:
-        +materialized: view
-        +schema: ECOM_ANALYTICS
-      GA4_SNAPSHOT:
-        +materialized: view
-        +schema: ECOM_ANALYTICS
-      GA4_SNAPSHOT_v2:
-        +materialized: view
-        +schema: ECOM_ANALYTICS
-      GA4_SNAPSHOT_v3:
-        +materialized: view
-        +schema: ECOM_ANALYTICS
-      GA4_SNAPSHOT_v4:
-        +materialized: view
-        +schema: ECOM_ANALYTICS
-      GA4_SNAPSHOT_v5:
-        +materialized: view
-        +schema: ECOM_ANALYTICS
-      GA4_SNAPSHOT_v6:
-        +materialized: view
-        +schema: ECOM_ANALYTICS
-      GA4_SNAPSHOT_RPT:
-        +materialized: view
-        +schema: ECOM_ANALYTICS
-      LAST_TOUCH_TRAFFIC:
-        +materialized: view
-        +schema: ECOM_ANALYTICS
-      LAST_TOUCH_EP:
-        +materialized: view
-        +schema: ECOM_ANALYTICS
-      FACT_RETAIL_SALES_RPT:
-        +materialized: view
-        +schema: ECOM_ANALYTICS
-      FACT_INVENTORY_RPT:
-        +materialized: view
-        +schema: ECOM_ANALYTICS
-      FACT_DEMAND_RPT:
-        +materialized: view
-        +schema: ECOM_ANALYTICS
-      FACT_STORE_HOUR_COUNTS_RPT:
-        +materialized: view
-        +schema: ECOM_ANALYTICS
-      DIM_LOCATION_RPT:
-        +materialized: view
-        +schema: ECOM_ANALYTICS
-      DIM_PRODUCT_RPT:
-        +materialized: view
-        +schema: ECOM_ANALYTICS
-      RETAIL_SALES_AGGREGATED:
+      GA4_FLATTENED:
         +materialized: view
         +schema: ECOM_ANALYTICS
       GA4_AGGREGATED:
+        +materialized: view
+        +schema: ECOM_ANALYTICS      
+      RETAIL_SALES_AGGREGATED:
         +materialized: view
         +schema: ECOM_ANALYTICS
       INVENTORY_AGGREGATED:
