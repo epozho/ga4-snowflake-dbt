@@ -1,6 +1,6 @@
 {{ config(materialized="table", database="RBOK_RPT", schema="ECOM_ANALYTICS") }}
 
-
+--Created a virtual table for Dates to bring in necessary calculations across Week, Quarter and Month
 With 
 Date_Table_Calc as
 (
@@ -63,6 +63,9 @@ MAX(DAY_NUM_IN_FISCAL_QUARTER) OVER (PARTITION BY ACCTGPRDQTRID) as MAX_FISCAL_Q
 MAX(DAY_NUM_IN_FISCAL_YEAR) OVER (PARTITION BY ACCTGPRDYRID) as MAX_FISCAL_YEAR_DAY_NUM
 from Date_Table_Calc
 ),
+--Created virtual table for EVEN_EXCHANGE flag where in ORIGINAL_TRANSACTION_ID with even exchanges are identified and captured as a flag in the source table as EEC.EVEN_EXCHANGE_FLAG
+--EVEN_EXCHANGE is calculated by first identifying the ORIGINAL_TRANSACTION_ID from FRS that have transactions with more than 1 Return Flag
+--Then we assign an EVEN EXCHANGE flag to the ORIGINAL_TRANSACTION_ID's that pass two rules, one for sum of GROSS_SALES_USD to be 0 and one for sum of UNITS_SOLD to be 0
 EVEN_EXCHANGE_CALCULATION as
 (
 Select distinct
@@ -78,6 +81,9 @@ GROUP BY
 ORIGINAL_TRANSACTION_ID
 ORDER BY ORIGINAL_TRANSACTION_ID
 )
+--Aggregation of the FRS source data
+--MARGIN_SALES: Calulcated by taking difference between sum of GROSS_SALES_USD and sum of COST_USD for every transaction
+--DISCOUNTED_FLAG: Created a DISCOUNTED_FLAG of either 0 or 1 based on whether a DISCOUNT_USD exists for a transaction
 Select
 ORIGINAL_TRANSACTION_ID,
 TRANSACTION_DATE,
@@ -144,6 +150,8 @@ STARTING_PRICE,
 PRICE_TYPE
 from
 (
+--Pulling in FRS data along with Left joins on Product, Even Exchange Flag, Product, Location and Date
+--PRICE_TYPE: Funneled down PRICE_TYPE to 3 categories (Markdown, FullPrice and Other), all Members are funneled down as a Markdown value
 Select
 Sales.ORIGINAL_TRANSACTION_ID,
 Sales.TRANSACTION_DATE,
@@ -216,6 +224,7 @@ LEFT JOIN "SPARC_BASE"."ECOM_ANALYTICS"."DIM_PRODUCT" as Product on Product.ITEM
 LEFT JOIN "SPARC_BASE"."ECOM_ANALYTICS"."DIM_LOCATION" as Location on Location.LOCATION_PK=Sales.LOCATION_PK
 LEFT JOIN Date_Table as Date_Table on Date_Table.CALDT=Sales.TRANSACTION_DATE
 LEFT JOIN EVEN_EXCHANGE_CALCULATION as EEC on Sales.ORIGINAL_TRANSACTION_ID=EEC.ORIGINAL_TRANSACTION_ID
+--Main WHERE clause to limit data between Go-Live date and the day prior to current date(yesterday) after every truncate refresh
 WHERE Sales.TRANSACTION_DATE >= '2023-05-08'
 AND Sales.TRANSACTION_DATE < CURRENT_DATE
 )

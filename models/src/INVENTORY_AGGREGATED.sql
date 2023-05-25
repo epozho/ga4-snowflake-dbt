@@ -1,5 +1,6 @@
 {{ config(materialized="table", database="RBOK_RPT", schema="ECOM_ANALYTICS") }}
 
+--Created a virtual table for Dates to bring in necessary calculations across Week, Quarter and Month
 With 
 Date_Table_Calc as
 (
@@ -62,6 +63,7 @@ MAX(DAY_NUM_IN_FISCAL_QUARTER) OVER (PARTITION BY ACCTGPRDQTRID) as MAX_FISCAL_Q
 MAX(DAY_NUM_IN_FISCAL_YEAR) OVER (PARTITION BY ACCTGPRDYRID) as MAX_FISCAL_YEAR_DAY_NUM
 from Date_Table_Calc
 )
+--Aggregation of the Inventory source data
 Select
 BRAND_CODE,
 LOCATION_PK,
@@ -179,6 +181,7 @@ from "SPARC_BASE"."ECOM_ANALYTICS"."FACT_INVENTORY" as Inventory
 LEFT JOIN "SPARC_BASE"."ECOM_ANALYTICS"."DIM_PRODUCT" as Product on Product.ITEM_PK=Inventory.ITEM_PK
 LEFT JOIN "SPARC_BASE"."ECOM_ANALYTICS"."DIM_LOCATION" as Location on Location.LOCATION_PK=Inventory.LOCATION_PK
 LEFT JOIN Date_Table as Date_Table on Date_Table.CALDT=Inventory.INVENTORY_DATE
+--Main WHERE clause where INVENTORY_DATE would truncate and pickup only the latest data available in table FACT_INVENTORY
 WHERE 
 Inventory.INVENTORY_DATE= 
 (Select max(INVENTORY_DATE) from "SPARC_BASE"."ECOM_ANALYTICS"."FACT_INVENTORY")

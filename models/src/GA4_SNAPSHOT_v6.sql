@@ -1,6 +1,7 @@
 {{ config(materialized="table", database="SPARC_BASE", schema="ECOM_ANALYTICS") }}
 
-
+--GA4_SNAPSHOT_v6 would be responsible to prepare the data for Aggregation by PIVOTING across Event Parameters and Event Name
+--EVENT_PARAMS_VALUE: Converged all the data type column values in EVENT_PARAMS under one column field EVENT_PARAMS_VALUE
 WITH 
 CLEAN_GA4_EVENT_PARAMS_VALUE AS
 (
@@ -31,6 +32,10 @@ CLEAN_GA4_EVENT_PARAMS_VALUE AS
                  ITEMS_ITEM_REVENUE_IN_USD
           FROM SPARC_RAW.RBOK_GA.GA4_EVENTS_RAW
 ),
+--Introducing the first PIVOT by function on EVENT_PARAMS_KEY to flatten the GA4 records
+--USER_SESSION_KEY: Created a crucial key called USER_SESSION_KEY by combining User Pseudo Id and Ga Session ID, this key will be used to perform many calculations on Session Metrics
+--EVENT_NAME_FLAG: Defined a flag value 1 called EVENT_NAME_FLAG to use as Value populating function for the second Pivot flatten
+--PIVOT: For the Pivot function, values defined in EVENT_PARAMS_KEY are the only values taken under consideration for dashboarding purposes
 FIRST_GA4_FLATTEN AS
 (
 	SELECT
@@ -64,6 +69,12 @@ FIRST_GA4_FLATTEN AS
           MAX(EVENT_PARAMS_VALUE) FOR EVENT_PARAMS_KEY IN ('page_type','page_owner','entrances','ga_session_id','checkout_orderdiscountvalue','session_engaged')
         ) AS pivoted_data
 )
+--Applying the Final Pivot functionality on EVENT_NAME to significantly reduce the size of GA4 data to aggregate upon
+--CHECKOUT_STAGE_ORDER: Defining the order of a checkout process from common EVENT_NAME's that directly impact a purchase/sale event
+--MAX_CHECKOUT_STAGE_ORDER: Applying a rank function to the CHECKOUT_STAGE_ORDER process to eventually determine a user's max event checkout stage
+--MAX_CHECKOUT_STAGE: Defining the maximum CHECKOUT_STAGE that a user has ever reached for any given event
+--UNITS_ORDERED: Assigning ITEMS_QUANTITY value to the events who has event_name defined as 'purchase'
+--PIVOT: For the Pivot function, values defined in EVENT_NAME are all of the event name values that can exist for any event
 Select
 (CASE
     WHEN EVENT_NAME_ORIGINAL='add_to_cart' THEN 1

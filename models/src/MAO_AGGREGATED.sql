@@ -1,5 +1,6 @@
 {{ config(materialized="table", database="RBOK_RPT", schema="ECOM_ANALYTICS") }}
 
+--Created a virtual table for Dates to bring in necessary calculations across Week, Quarter and Month
 With 
 Date_Table_Calc as
 (
@@ -62,6 +63,11 @@ MAX(DAY_NUM_IN_FISCAL_QUARTER) OVER (PARTITION BY ACCTGPRDQTRID) as MAX_FISCAL_Q
 MAX(DAY_NUM_IN_FISCAL_YEAR) OVER (PARTITION BY ACCTGPRDYRID) as MAX_FISCAL_YEAR_DAY_NUM
 from Date_Table_Calc
 ),
+--Made couple of necessary changes required for Demand data before joining the Product, Location and Date attributes to each record as the current state of Demand table only consists of R0700 Location Id's:
+--BRAND_LOCATION: Built a Case statement to ensure that Walmart, Target and Ebay are tracked correctly with their respective BRAND_LOCATION values
+--LOCATION_PK: Built a Case statement to ensure that Walmart, Target and Ebay are tracked correctly with their respective LOCATION_PK values
+--DISCOUNT_AMOUNT_USD: Used a COALESCE function on DISCOUNT_AMOUNT_USD as the original data has NULL values present that error upon creating any calculations on top of it, hence the fix to replace NULL with 0
+--MAO data will be read from the New Target table created in Snowflake called FACT_DEMAND_TARGET_TABLE
 UPDATED_DEMAND as
 (
 Select 
@@ -100,6 +106,9 @@ MAO.FULFILLMENT_ID,
 MAO.SOURCE
 from "SPARC_BASE"."ECOM_ANALYTICS"."FACT_DEMAND_TARGET_TABLE" as MAO
 )
+--Final Aggregation:
+--MAX_FULFILLMENT_STATUS_ID: Converted MAX_FULFILLMENT_STATUS_ID from String to a Number
+--OPEN_ORDER_ID: Created a Flag that identifies records which are currently in an OPEN state based on MAX_FULFILLMENT_STATUS_ID's
 Select
 BRAND_LOCATION,
 LOCATION_PK,
@@ -109,7 +118,7 @@ ORDER_TYPE,
 ORDER_PK,
 ORDER_ID,
 --MIN_FULFILLMENT_STATUS_ID,
-TO_NUMBER(MAX_FULFILLMENT_STATUS_ID) as MAX_FULFILLMENT_STATUS_ID,
+MAX_FULFILLMENT_STATUS_ID,
 CURRENT_STATUS,
 (CASE WHEN MAX_FULFILLMENT_STATUS_ID < 7000 THEN ORDER_ID ELSE NULL END) as OPEN_ORDER_ID,
 IS_RETURN,
@@ -175,6 +184,10 @@ MAX_FISCAL_MONTH_DAY_NUM,
 MAX_FISCAL_QUARTER_DAY_NUM,
 MAX_FISCAL_YEAR_DAY_NUM
 from(
+--CURRENT_STATUS: Defined a description for every Status code in MAX_FULFILLMENT_STATUS_ID to determine the Current status of a record
+--NET_DEMAND_DOLLARS: To calculate NET_DEMAND_DOLLARS, we need to ensure that all 3 flags (IsReturn,IsCancelled and IsGiftCard) are all 0 to then sum up DEMAND_DOLLARS_USD and DISCOUNT_AMOUNT_USD
+--REPORTABLE_ORDER_ID: To calculate REPORTABLE_ORDER_ID, we need to ensure that all 3 flags (IsReturn,IsCancelled and IsGiftCard) are all 0 to then set the ORDER_ID value for distinct count purposes at the dashboard level
+--PRICE_TYPE: Funneled down PRICE_TYPE to 3 categories (Markdown, FullPrice and Other), all Members are funneled down as a Markdown value
 Select
 MAO.BRAND_LOCATION,
 MAO.LOCATION_PK,
@@ -184,7 +197,7 @@ MAO.ORDER_TYPE,
 MAO.ORDER_PK,
 MAO.ORDER_ID,
 --MAO.MIN_FULFILLMENT_STATUS_ID,
-MAO.MAX_FULFILLMENT_STATUS_ID,
+TO_NUMBER(MAO.MAX_FULFILLMENT_STATUS_ID) as MAX_FULFILLMENT_STATUS_ID,
 (CASE
     WHEN MAO.MAX_FULFILLMENT_STATUS_ID='7000' THEN 'Fulfilled'
     WHEN MAO.MAX_FULFILLMENT_STATUS_ID='1500' THEN 'Back Ordered'
@@ -281,6 +294,7 @@ from UPDATED_DEMAND as MAO
 LEFT JOIN "SPARC_BASE"."ECOM_ANALYTICS"."DIM_PRODUCT" as Product on Product.ITEM_PK=MAO.ITEM_PK
 LEFT JOIN "SPARC_BASE"."ECOM_ANALYTICS"."DIM_LOCATION" as Location on Location.LOCATION_PK=MAO.LOCATION_PK
 LEFT JOIN Date_Table as Date_Table on Date_Table.CALDT=MAO.DEMAND_DATE_LOCAL
+--Main WHERE clause to limit data between Go-Live date and the day prior to current date(yesterday) after every truncate refresh
 WHERE MAO.DEMAND_DATE_LOCAL >= '2023-05-08'
 AND MAO.DEMAND_DATE_LOCAL < CURRENT_DATE
 )
