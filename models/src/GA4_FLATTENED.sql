@@ -1,6 +1,6 @@
 {{ config(materialized="table", database="SPARC_BASE", schema="ECOM_ANALYTICS") }}
 
---GA4_SNAPSHOT_v6 would be responsible to prepare the data for Aggregation by PIVOTING across Event Parameters and Event Name
+--GA4_FLATTENED would be responsible to prepare the data for Aggregation by PIVOTING across Event Parameters and Event Name
 --EVENT_PARAMS_VALUE: Converged all the data type column values in EVENT_PARAMS under one column field EVENT_PARAMS_VALUE
 WITH 
 CLEAN_GA4_EVENT_PARAMS_VALUE AS
