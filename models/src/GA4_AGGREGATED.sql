@@ -177,19 +177,19 @@ Traffic.TRAFFIC_SOURCE_SOURCE AS LASTTOUCH_TRAFFIC_SOURCE,
 (CASE
     WHEN LOWER(LASTTOUCH_TRAFFIC_MEDIUM)='affiliate' THEN 'Affiliates'
     WHEN LOWER(LASTTOUCH_TRAFFIC_MEDIUM) IN ('display','banner','expandable','interstitial','cpm') THEN 'Display'
-    WHEN LOWER(LASTTOUCH_TRAFFIC_MEDIUM)='organic' THEN 'Organic Search'
-    WHEN REGEXP_LIKE(LOWER(LASTTOUCH_TRAFFIC_CAMPAIGN), '^(.*(([^a-df-z]|^)shop|shopping).*)$') OR LOWER(LASTTOUCH_TRAFFIC_SOURCE)='shopping free listings' THEN 'Organic Shopping'
-    WHEN (CONTAINS(LOWER(LASTTOUCH_TRAFFIC_MEDIUM),'social') AND LOWER(LASTTOUCH_TRAFFIC_MEDIUM) NOT LIKE '%paid%') OR LOWER(LASTTOUCH_TRAFFIC_MEDIUM) IN ('social-network','social-media','sm','social network','social media') THEN 'Organic Social'
     WHEN (REGEXP_LIKE(LOWER(LASTTOUCH_TRAFFIC_MEDIUM), '^(.*cp.*|ppc|retargeting|paid.*)$')) AND (LOWER(LASTTOUCH_TRAFFIC_CAMPAIGN) LIKE '%#_brand#_%' ESCAPE '#') THEN 'Paid Search - Branded'
     WHEN (REGEXP_LIKE(LOWER(LASTTOUCH_TRAFFIC_MEDIUM), '^(.*cp.*|ppc|retargeting|paid.*)$')) AND (LOWER(LASTTOUCH_TRAFFIC_CAMPAIGN) LIKE '%#_nb#_%' ESCAPE '#') THEN 'Paid Search - NB'
-    WHEN (REGEXP_LIKE(LOWER(LASTTOUCH_TRAFFIC_MEDIUM), '^(.*cp.*|ppc|retargeting|paid.*)$')) AND (REGEXP_LIKE(LOWER(LASTTOUCH_TRAFFIC_CAMPAIGN), '^(.*(([^a-df-z]|^)shop|shopping).*)$')) THEN 'Paid Shopping'
     WHEN LOWER(LASTTOUCH_TRAFFIC_MEDIUM)='paidsocial' THEN 'Paid Social'
-    WHEN LOWER(LASTTOUCH_TRAFFIC_SOURCE)='sfmc_promo' THEN 'Promotional Email'
+    WHEN (REGEXP_LIKE(LOWER(LASTTOUCH_TRAFFIC_MEDIUM), '^(.*cp.*|ppc|retargeting|paid.*)$')) AND (REGEXP_LIKE(LOWER(LASTTOUCH_TRAFFIC_CAMPAIGN), '^(.*(([^a-df-z]|^)shop|shopping).*)$')) THEN 'Paid Shopping'
+    WHEN LOWER(LASTTOUCH_TRAFFIC_MEDIUM)='organic' THEN 'Organic Search'
+    WHEN REGEXP_LIKE(LOWER(LASTTOUCH_TRAFFIC_CAMPAIGN), '^(.*(([^a-df-z]|^)shop|shopping).*)$') OR LOWER(LASTTOUCH_TRAFFIC_SOURCE)='shopping free listings' THEN 'Organic Shopping'
+    WHEN LOWER(LASTTOUCH_TRAFFIC_MEDIUM) IN ('social','social-network','social-media','sm','social network','social media') THEN 'Organic Social'
     WHEN LOWER(LASTTOUCH_TRAFFIC_MEDIUM) IN ('referral','app','link') THEN 'Referral'
-    WHEN LOWER(LASTTOUCH_TRAFFIC_MEDIUM)='sms' THEN 'SMS Marketing'
-    WHEN LOWER(LASTTOUCH_TRAFFIC_SOURCE)='sfmc_transactional' THEN 'Transactional Email'
-    WHEN LOWER(LASTTOUCH_TRAFFIC_SOURCE)='sfmc_trigger' THEN 'Triggered Email'
-    WHEN LOWER(LASTTOUCH_TRAFFIC_SOURCE)='(direct)' THEN 'Web Direct'
+    WHEN LOWER(LASTTOUCH_TRAFFIC_SOURCE)='sms' OR LOWER(LASTTOUCH_TRAFFIC_MEDIUM)='sms' THEN 'SMS Marketing'
+    WHEN LOWER(LASTTOUCH_TRAFFIC_SOURCE) IN ('sfmc_promo','bluecore_promo') THEN 'Promotional Email'
+    WHEN LOWER(LASTTOUCH_TRAFFIC_SOURCE) IN ('sfmc_transactional','narvar_transactional') THEN 'Transactional Email'
+    WHEN LOWER(LASTTOUCH_TRAFFIC_SOURCE) IN ('sfmc_trigger','bluecore_trigger') THEN 'Triggered Email'
+    WHEN LOWER(LASTTOUCH_TRAFFIC_SOURCE)='(direct)' AND LOWER(LASTTOUCH_TRAFFIC_MEDIUM) IN ('(not set)','(none)') THEN 'Web Direct'
     ELSE NULL
 END) as MEDIA_CHANNEL,
 (CASE 
